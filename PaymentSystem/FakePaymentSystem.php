@@ -35,11 +35,11 @@ class FakePaymentSystem implements CreditCardInterface
     protected $transactionRepository;
 
     /* @var string */
-    protected $notificationUrl = null;
+    protected $notificationRoute = null;
     /* @var string */
-    protected $externalBackToShopUrl = null;
+    protected $externalBackToShopRoute = null;
     /* @var string */
-    protected $internalBackToShopUrl = null;
+    protected $internalBackToShopRoute = null;
 
 
     public function __construct(
@@ -48,9 +48,9 @@ class FakePaymentSystem implements CreditCardInterface
         EngineInterface $templating,
         RouterInterface $router,
         LoggerInterface $logger,
-        $notificationUrl,
-        $internalBackToShopUrl,
-        $externalBackToShopUrl
+        $notificationRoute,
+        $internalBackToShopRoute,
+        $externalBackToShopRoute
     )
     {
         $this->transactionRepository = $transactionRepository;
@@ -58,12 +58,12 @@ class FakePaymentSystem implements CreditCardInterface
         $this->templating = $templating;
         $this->router = $router;
         $this->logger = $logger;
-        if (!$notificationUrl) {
-            $notificationUrl = $router->generate("kitano_payment_payment_notification");
+        if (!$notificationRoute) {
+            $notificationRoute = "kitano_payment_payment_notification";
         }
-        $this->notificationUrl = $notificationUrl;
-        $this->internalBackToShopUrl = $internalBackToShopUrl;
-        $this->externalBackToShopUrl = $externalBackToShopUrl;
+        $this->notificationRoute = $notificationRoute;
+        $this->internalBackToShopRoute = $internalBackToShopRoute;
+        $this->externalBackToShopRoute = $externalBackToShopRoute;
     }
 
     public function authorizeAndCapture(Transaction $transaction)
@@ -81,9 +81,9 @@ class FakePaymentSystem implements CreditCardInterface
             'orderId' => $transaction->getOrderId(),
             'transactionId' => $transaction->getId(),
             'amount'  => $this->formatAmount($transaction->getAmount(), $transaction->getCurrency()),
-            'notificationUrl' => $this->notificationUrl,
-            'internalBackToShop' => $this->internalBackToShopUrl,
-            'externalBackToShop' => $this->externalBackToShopUrl
+            'notificationRoute' => $this->notificationRoute,
+            'internalBackToShopRoute' => $this->internalBackToShopRoute,
+            'externalBackToShopRoute' => $this->externalBackToShopRoute
         ));
     }
 
@@ -131,7 +131,11 @@ class FakePaymentSystem implements CreditCardInterface
     {
         $transaction = $this->transactionRepository->find($request->query->get('transactionId', null));
         
-        $response = new RedirectResponse($this->externalBackToShopUrl.'?transactionId='.$request->get('transactionId', null), "302");
+        $externalBackToShopUrl = $this->router->generate($this->externalBackToShopRoute, array(
+            'transactionId' => $request->get('transactionId', null),
+        ));
+        
+        $response = new RedirectResponse($externalBackToShopUrl, "302");
         return new HandlePaymentResponse($transaction, $response);
     }
 
@@ -142,7 +146,7 @@ class FakePaymentSystem implements CreditCardInterface
     {
         // Initialize session and set URL.
         $ch = curl_init();
-        $url = $this->getBaseUrl() . $this->router->generate('kitano_payment_fake_capture', array(), false);
+        $url = $this->router->generate('kitano_payment_fake_capture', array(), true);
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // Set so curl_exec returns the result instead of outputting it.

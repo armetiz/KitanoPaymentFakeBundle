@@ -16,24 +16,24 @@ class PaymentController extends Controller
         switch ($mode) {
             case 'accept':
                 $data['code'] = 1;
-                $redirectUrl = $request->get('internal_back_to_shop');
+                $redirectRoute = $request->get('internal_back_to_shop_route');
                 break;
 
             case 'refuse':
                 $data['code'] = 0;
-                $redirectUrl = $request->get('internal_back_to_shop');
+                $redirectRoute = $request->get('internal_back_to_shop_route');
                 break;
 
             default:
                 $data['code'] = -1;
-                $redirectUrl = $request->get('internal_back_to_shop');
+                $redirectRoute = $request->get('internal_back_to_shop_route');
         }
 
         
         
         $this->sendPaymentNotification($data, $this->generateUrl($request->get('notification_route')));
 
-        return $this->redirect($redirectUrl."?transactionId=".$data["transactionId"]);
+        return $this->redirect($this->generateUrl($redirectRoute, array('transactionId' => $data["transactionId"])));
     }
 
     public function captureRequestAction()
