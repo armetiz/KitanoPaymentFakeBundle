@@ -129,8 +129,10 @@ class FakePaymentSystem implements CreditCardInterface
      */
     public function handleBackToShop(Request $request)
     {
+        $transaction = $this->transactionRepository->find($request->query->get('transactionId', null));
+        
         $response = new RedirectResponse($this->externalBackToShopUrl.'?transactionId='.$request->get('transactionId', null), "302");
-        return new HandlePaymentResponse(null, $response);
+        return new HandlePaymentResponse($transaction, $response);
     }
 
     /**
