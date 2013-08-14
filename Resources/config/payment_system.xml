@@ -15,9 +15,9 @@
             <argument type="service" id="templating" />
             <argument type="service" id="router" />
             <argument type="service" id="logger" />
-            <argument>%kitano_payment.config.notification_url%</argument>
-            <argument>%kitano_payment.config.internal_back_to_shop_url%</argument>
-            <argument>%kitano_payment.config.external_back_to_shop_url%</argument>
+            <argument>%kitano_payment.config.notification_route%</argument>
+            <argument>%kitano_payment.config.internal_back_to_shop_route%</argument>
+            <argument>%kitano_payment.config.external_back_to_shop_route%</argument>
             <tag name="monolog.logger" channel="kitano_payment" />
         </service>
     </services>

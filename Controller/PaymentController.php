@@ -29,7 +29,9 @@ class PaymentController extends Controller
                 $redirectUrl = $request->get('internal_back_to_shop');
         }
 
-        $this->sendPaymentNotification($data, $request->get('notification_url'));
+        
+        
+        $this->sendPaymentNotification($data, $this->generateUrl($request->get('notification_route')));
 
         return $this->redirect($redirectUrl."?transactionId=".$data["transactionId"]);
     }
