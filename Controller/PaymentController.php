@@ -31,7 +31,7 @@ class PaymentController extends Controller
 
         
         
-        $this->sendPaymentNotification($data, $this->generateUrl($request->get('notification_route')));
+        $this->sendPaymentNotification($data, $this->generateUrl($request->get('notification_route'), array(), true));
 
         return $this->redirect($this->generateUrl($redirectRoute, array('transactionId' => $data["transactionId"])));
     }
